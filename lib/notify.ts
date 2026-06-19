@@ -30,3 +30,22 @@ export async function notifyNewLead(lead: {
     console.error("[notify] lead email failed:", (e as Error).message);
   }
 }
+
+// Alerts staff when a client opens or replies to a ticket (no-op without Resend).
+export async function notifyStaffClientTicket(subject: string, clientName: string, isReply = false) {
+  const key = process.env.RESEND_API_KEY;
+  const to = process.env.LAKONOS_ALERT_EMAIL || process.env.LAKONOS_OWNER_EMAIL;
+  if (!key || !to) return;
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(key);
+    await resend.emails.send({
+      from: process.env.LAKONOS_ALERT_FROM || "Lakonos <onboarding@resend.dev>",
+      to,
+      subject: `${isReply ? "Client reply" : "New client ticket"}: ${subject} — ${clientName}`,
+      text: `${clientName} ${isReply ? "replied to" : "opened"} a ticket: ${subject}\n\nDashboard: https://lakonos.vercel.app/admin/tickets`,
+    });
+  } catch (e) {
+    console.error("[notify] staff ticket alert failed:", (e as Error).message);
+  }
+}

@@ -18,6 +18,7 @@ type Ticket = {
 type Message = {
   id: string;
   author_name: string | null;
+  author_staff: string | null;
   body: string;
   internal: boolean;
   created_at: string;
@@ -139,7 +140,7 @@ export default function TicketDetail({
           <div key={m.id} className={`msg${m.internal ? " int" : ""}`}>
             <div className="meta">
               {m.author_name || "Staff"} · {fmt(m.created_at)}
-              {m.internal ? " · internal note" : ""}
+              {m.internal ? " · internal note" : !m.author_staff ? " · from client" : ""}
             </div>
             <div style={{ whiteSpace: "pre-wrap" }}>{m.body}</div>
           </div>

@@ -11,6 +11,7 @@ type Retainer = {
   cycle: string;
   status: string;
   next_bill_date: string | null;
+  pf_subscribed: boolean;
 };
 
 const CYCLES = ["monthly", "quarterly", "annual"];
@@ -101,6 +102,7 @@ export default function RetainersPanel() {
               <th>Cycle</th>
               <th>Next bill</th>
               <th>Status</th>
+              <th>Billing</th>
             </tr>
           </thead>
           <tbody>
@@ -121,6 +123,13 @@ export default function RetainersPanel() {
                       </option>
                     ))}
                   </select>
+                </td>
+                <td>
+                  {r.pf_subscribed ? (
+                    <span className="badge green">Auto</span>
+                  ) : (
+                    <span className="muted">—</span>
+                  )}
                 </td>
               </tr>
             ))}

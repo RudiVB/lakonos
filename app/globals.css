@@ -271,3 +271,10 @@ footer small{color:var(--steel);font-size:13px;letter-spacing:.5px;}
 .msg.int{border-style:dashed;background:transparent;}
 .msg .meta{font-size:11px;color:var(--steel);margin-bottom:5px;font-family:var(--mono);}
 @media(max-width:640px){.adminform .row2,.adminform .row3{grid-template-columns:1fr;}.tbl{font-size:13px;}}
+
+/* ===== portal banners ===== */
+.banner{border:1px solid var(--line);border-radius:5px;padding:12px 16px;margin:10px 0 18px;font-size:14px;}
+.banner.ok{color:#7ec98f;border-color:#2f5f3a;}
+.banner.warn{color:#e0b057;border-color:#6b521f;}
+.pay-card{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:5px;padding:16px 20px;margin-bottom:12px;background:var(--stone-2);}
+.pay-card .amt{font-family:var(--mono);font-size:18px;color:var(--bronze);}
