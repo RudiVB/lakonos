@@ -1,0 +1,59 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+// Staff sign-in. Authenticates against Supabase Auth; the server then
+// checks the user is in lakonos_staff before allowing /admin access.
+export default function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    // sign in with email + password
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError("Wrong email or password.");
+      setLoading(false);
+      return;
+    }
+    router.push("/admin"); // server will redirect back here if not staff
+    router.refresh();
+  }
+
+  return (
+    <div className="admin-login">
+      <form onSubmit={submit}>
+        <span className="wordmark">
+          L<span className="lam">Λ</span>KONOS
+        </span>
+        <h1>Staff sign in</h1>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoFocus
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? "Signing in…" : "Sign in"}
+        </button>
+        {error && <p className="form-msg err">{error}</p>}
+      </form>
+    </div>
+  );
+}

@@ -9,11 +9,8 @@ export default function Home() {
           <span className="wordmark">
             L<span className="lam">Λ</span>KONOS
           </span>
-          <a
-            className="btn btn-primary nav-cta"
-            href="mailto:rudi@lakonos.com?subject=Lakonos%20demo"
-          >
-            Book a demo
+          <a className="btn btn-primary nav-cta" href="#start">
+            Get in touch
           </a>
         </div>
       </nav>
@@ -33,7 +30,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn btn-primary" href="#start">
-              See it running
+              Get in touch
             </a>
             <a className="btn btn-ghost" href="#proof">
               View the proof
@@ -149,8 +146,8 @@ export default function Home() {
         <div className="wrap">
           <h2>Ready to run lean?</h2>
           <p>
-            Tell us what your team does by hand. We&apos;ll show you what it could automate — and
-            book a 20-minute look at the system running live.
+            Tell us what your team does by hand. Leave your details and we&apos;ll get back to you
+            with what we&apos;d automate — and what it would cost.
           </p>
           <LeadForm />
           <a className="email" href="mailto:rudi@lakonos.com">

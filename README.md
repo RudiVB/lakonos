@@ -77,3 +77,15 @@ git push -u origin main
 - The old 3PL and the manufacturer are intentionally **not named** in the copy.
 - All brand colours/type live in `app/globals.css` (`:root`).
 - Logo assets (SVG): wordmark, icon, favicon — keep them in `/public` if you want to reference them as files.
+
+---
+
+## Admin dashboard
+
+Log in at **`/admin`** to view and follow up leads.
+
+Two extra env vars (in `.env.local` and on Vercel):
+- `ADMIN_PASSWORD` — the password you log in with
+- `ADMIN_SESSION_SECRET` — any long random string (signs the session cookie)
+
+Leads appear newest-first. Tick **Followed up**, add **notes** per lead, hit **Reply** to email them. Access is gated by an httpOnly signed cookie; the leads API reads/writes via the Supabase service-role key server-side, so the browser never touches the database directly.

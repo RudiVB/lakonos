@@ -65,7 +65,7 @@ export default function LeadForm() {
         onChange={update}
       />
       <button type="submit" className="btn btn-primary" disabled={status === "sending"}>
-        {status === "sending" ? "Sending…" : "Book a demo"}
+        {status === "sending" ? "Sending…" : "Get in touch"}
       </button>
       {status === "err" && <p className="form-msg err">{error}</p>}
     </form>
