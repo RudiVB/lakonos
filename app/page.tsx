@@ -9,9 +9,15 @@ export default function Home() {
           <span className="wordmark">
             L<span className="lam">Λ</span>KONOS
           </span>
-          <a className="btn btn-primary nav-cta" href="#start">
-            Get in touch
-          </a>
+          <div className="nav-links">
+            <a href="#services">What we do</a>
+            <a href="#proof">Proof</a>
+            <a href="#how">How it works</a>
+            <a href="/portal/login">Client login</a>
+            <a className="btn btn-primary nav-cta" href="#start">
+              Get in touch
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -89,7 +95,7 @@ export default function Home() {
       </section>
 
       {/* ===================== WHAT WE AUTOMATE ===================== */}
-      <section className="block">
+      <section className="block" id="services">
         <div className="wrap">
           <div className="eyebrow">What we automate</div>
           <h2 className="head">If your team does it by hand, we can automate it.</h2>
@@ -129,7 +135,7 @@ export default function Home() {
       </section>
 
       {/* ===================== HOW IT WORKS ===================== */}
-      <section className="block">
+      <section className="block" id="how">
         <div className="wrap">
           <div className="eyebrow">How it works</div>
           <h2 className="head">We build the system around you — not the other way around.</h2>
@@ -158,11 +164,36 @@ export default function Home() {
 
       {/* ===================== FOOTER ===================== */}
       <footer>
-        <div className="wrap">
-          <span className="wordmark">
-            L<span className="lam">Λ</span>KONOS
-          </span>
-          <small>One system. Whole operation. &nbsp;·&nbsp; © 2026 Lakonos</small>
+        <div className="wrap footer-grid">
+          <div className="footer-brand">
+            <span className="wordmark">
+              L<span className="lam">Λ</span>KONOS
+            </span>
+            <p>
+              Custom business automation for South African operators. One system, your whole
+              operation — built from scratch to fit how you already work.
+            </p>
+          </div>
+          <div className="footer-col">
+            <h4>Explore</h4>
+            <a href="#services">What we automate</a>
+            <a href="#proof">Proof</a>
+            <a href="#how">How it works</a>
+            <a href="#start">Get in touch</a>
+          </div>
+          <div className="footer-col">
+            <h4>Account</h4>
+            <a href="/portal/login">Client login</a>
+            <a href="/admin/login">Staff login</a>
+          </div>
+          <div className="footer-col">
+            <h4>Contact</h4>
+            <a href="mailto:rudi@lakonos.com">rudi@lakonos.com</a>
+            <span className="foot-muted">South Africa</span>
+          </div>
+        </div>
+        <div className="wrap footer-bottom">
+          <small>© 2026 Lakonos &nbsp;·&nbsp; One system. Whole operation.</small>
         </div>
       </footer>
     </>
