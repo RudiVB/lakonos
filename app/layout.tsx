@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ScrollAnimations from "@/components/ScrollAnimations";
 
 export const metadata: Metadata = {
   title: "Lakonos — Automate the work your people do by hand",
@@ -27,7 +28,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ScrollAnimations />
+      </body>
     </html>
   );
 }
