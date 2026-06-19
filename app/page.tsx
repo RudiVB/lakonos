@@ -4,20 +4,17 @@ export default function Home() {
   return (
     <>
       {/* ===================== NAV ===================== */}
-      <nav className="site-nav">
+      <nav>
         <div className="wrap">
           <span className="wordmark">
             L<span className="lam">Λ</span>KONOS
           </span>
-          <div className="nav-links">
-            <a href="#services">What we do</a>
-            <a href="#proof">Proof</a>
-            <a href="#how">How it works</a>
-            <a href="/portal/login">Client login</a>
-            <a className="btn btn-primary nav-cta" href="#start">
-              Get in touch
-            </a>
-          </div>
+          <a
+            className="btn btn-primary nav-cta"
+            href="mailto:rudi@lakonos.com?subject=Lakonos%20demo"
+          >
+            Book a demo
+          </a>
         </div>
       </nav>
 
@@ -36,7 +33,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn btn-primary" href="#start">
-              Get in touch
+              See it running
             </a>
             <a className="btn btn-ghost" href="#proof">
               View the proof
@@ -95,7 +92,7 @@ export default function Home() {
       </section>
 
       {/* ===================== WHAT WE AUTOMATE ===================== */}
-      <section className="block" id="services">
+      <section className="block">
         <div className="wrap">
           <div className="eyebrow">What we automate</div>
           <h2 className="head">If your team does it by hand, we can automate it.</h2>
@@ -131,16 +128,11 @@ export default function Home() {
           <p className="proof-note">
             <span className="lam">Λ</span> &nbsp;Replaced a full third-party 3PL system — entirely.
           </p>
-          <div className="actions" style={{ marginTop: 28 }}>
-            <a className="btn btn-ghost" href="/case-study">
-              Read the full case study
-            </a>
-          </div>
         </div>
       </section>
 
       {/* ===================== HOW IT WORKS ===================== */}
-      <section className="block" id="how">
+      <section className="block">
         <div className="wrap">
           <div className="eyebrow">How it works</div>
           <h2 className="head">We build the system around you — not the other way around.</h2>
@@ -157,8 +149,8 @@ export default function Home() {
         <div className="wrap">
           <h2>Ready to run lean?</h2>
           <p>
-            Tell us what your team does by hand. Leave your details and we&apos;ll get back to you
-            with what we&apos;d automate — and what it would cost.
+            Tell us what your team does by hand. We&apos;ll show you what it could automate — and
+            book a 20-minute look at the system running live.
           </p>
           <LeadForm />
           <a className="email" href="mailto:rudi@lakonos.com">
@@ -169,40 +161,11 @@ export default function Home() {
 
       {/* ===================== FOOTER ===================== */}
       <footer>
-        <div className="wrap footer-grid">
-          <div className="footer-brand">
-            <span className="wordmark">
-              L<span className="lam">Λ</span>KONOS
-            </span>
-            <p>
-              Custom business automation for South African operators. One system, your whole
-              operation — built from scratch to fit how you already work.
-            </p>
-          </div>
-          <div className="footer-col">
-            <h4>Explore</h4>
-            <a href="#services">What we automate</a>
-            <a href="#proof">Proof</a>
-            <a href="/case-study">Case study</a>
-            <a href="#how">How it works</a>
-            <a href="#start">Get in touch</a>
-          </div>
-          <div className="footer-col">
-            <h4>Account</h4>
-            <a href="/portal/login">Client login</a>
-            <a href="/admin/login">Staff login</a>
-          </div>
-          <div className="footer-col">
-            <h4>Contact</h4>
-            <a href="mailto:rudi@lakonos.com">rudi@lakonos.com</a>
-            <span className="foot-muted">South Africa</span>
-          </div>
-        </div>
-        <div className="wrap footer-bottom">
-          <small>
-            © 2026 Lakonos &nbsp;·&nbsp; <a href="/privacy">Privacy</a> &nbsp;·&nbsp;{" "}
-            <a href="/terms">Terms</a>
-          </small>
+        <div className="wrap">
+          <span className="wordmark">
+            L<span className="lam">Λ</span>KONOS
+          </span>
+          <small>One system. Whole operation. &nbsp;·&nbsp; © 2026 Lakonos</small>
         </div>
       </footer>
     </>
