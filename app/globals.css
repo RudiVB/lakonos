@@ -443,3 +443,12 @@ html.anim .reveal-target.in{opacity:1;transform:none;}
 .cs-cta h2{font-family:var(--display);font-weight:800;font-size:30px;margin-bottom:12px;}
 .cs-cta p{color:var(--steel);margin-bottom:24px;}
 @media(max-width:720px){.cs-stats{grid-template-columns:1fr 1fr;}.cs-build{grid-template-columns:1fr;}}
+
+
+/* hero / quote reassurance line */
+.trust{margin-top:22px;color:var(--steel);font-size:13px;letter-spacing:.4px;}
+.trust b{color:var(--bone);font-weight:600;}
+.cta .trust{margin-top:18px;}
+
+/* project-size tier badge */
+.mod .tier{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--bronze);border:1px solid var(--line);border-radius:99px;padding:3px 10px;margin-bottom:12px;}
