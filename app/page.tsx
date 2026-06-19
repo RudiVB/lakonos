@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
       {/* ===================== NAV ===================== */}
-      <nav>
+      <nav className="site-nav">
         <div className="wrap">
           <span className="wordmark">
             L<span className="lam">Λ</span>KONOS
@@ -131,6 +131,11 @@ export default function Home() {
           <p className="proof-note">
             <span className="lam">Λ</span> &nbsp;Replaced a full third-party 3PL system — entirely.
           </p>
+          <div className="actions" style={{ marginTop: 28 }}>
+            <a className="btn btn-ghost" href="/case-study">
+              Read the full case study
+            </a>
+          </div>
         </div>
       </section>
 
@@ -178,6 +183,7 @@ export default function Home() {
             <h4>Explore</h4>
             <a href="#services">What we automate</a>
             <a href="#proof">Proof</a>
+            <a href="/case-study">Case study</a>
             <a href="#how">How it works</a>
             <a href="#start">Get in touch</a>
           </div>
@@ -193,7 +199,10 @@ export default function Home() {
           </div>
         </div>
         <div className="wrap footer-bottom">
-          <small>© 2026 Lakonos &nbsp;·&nbsp; One system. Whole operation.</small>
+          <small>
+            © 2026 Lakonos &nbsp;·&nbsp; <a href="/privacy">Privacy</a> &nbsp;·&nbsp;{" "}
+            <a href="/terms">Terms</a>
+          </small>
         </div>
       </footer>
     </>

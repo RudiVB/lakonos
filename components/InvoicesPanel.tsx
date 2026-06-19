@@ -116,7 +116,9 @@ export default function InvoicesPanel() {
             {invoices.map((v) => (
               <tr key={v.id}>
                 <td>
-                  <strong>{v.number || v.id.slice(0, 8)}</strong>
+                  <a className="linkish" href={`/invoice/${v.id}`}>
+                    <strong>{v.number || v.id.slice(0, 8)}</strong>
+                  </a>
                 </td>
                 <td className="muted">{clientName(v.client_id)}</td>
                 <td className="muted">{v.issue_date}</td>

@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
-// Tab definitions. `manage: true` = only owner/admin see it.
 const TABS = [
-  { href: "/admin", label: "Leads", key: "leads", manage: false },
+  { href: "/admin", label: "Dashboard", key: "dashboard", manage: false },
+  { href: "/admin/leads", label: "Leads", key: "leads", manage: false },
   { href: "/admin/clients", label: "Clients", key: "clients", manage: false },
   { href: "/admin/retainers", label: "Retainers", key: "retainers", manage: true },
   { href: "/admin/tickets", label: "Tickets", key: "tickets", manage: false },
@@ -19,17 +19,18 @@ const TABS = [
 export default function AdminShell({
   role,
   name,
-  active,
   children,
 }: {
   role: string;
   name: string;
-  active: string;
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
   const canManage = role === "owner" || role === "admin";
+  // /admin -> dashboard ; /admin/<seg>/... -> <seg>
+  const seg = pathname === "/admin" ? "dashboard" : pathname.split("/")[2] || "dashboard";
 
   async function logout() {
     await supabase.auth.signOut();
@@ -58,7 +59,7 @@ export default function AdminShell({
       <div className="wrap" style={{ paddingTop: 16 }}>
         <nav className="admin-tabs">
           {TABS.filter((t) => !t.manage || canManage).map((t) => (
-            <Link key={t.key} href={t.href} className={active === t.key ? "on" : ""}>
+            <Link key={t.key} href={t.href} className={seg === t.key ? "on" : ""}>
               {t.label}
             </Link>
           ))}

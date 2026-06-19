@@ -13,6 +13,7 @@ type Retainer = {
   last_paid_at: string | null;
 };
 type Payment = { id: string; amount: number; paid_at: string };
+type Invoice = { id: string; number: string | null; status: string; issue_date: string; total: number };
 
 const rands = (n: number) =>
   "R" + (Number(n) || 0).toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -20,6 +21,7 @@ const rands = (n: number) =>
 export default function PortalBilling() {
   const [retainers, setRetainers] = useState<Retainer[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [banner, setBanner] = useState<{ kind: string; text: string } | null>(null);
@@ -35,9 +37,10 @@ export default function PortalBilling() {
 
   async function load() {
     const r = await fetch("/api/portal/billing");
-    const d = await r.json().catch(() => ({ retainers: [], payments: [] }));
+    const d = await r.json().catch(() => ({ retainers: [], payments: [], invoices: [] }));
     setRetainers(d.retainers || []);
     setPayments(d.payments || []);
+    setInvoices(d.invoices || []);
     setLoading(false);
   }
   useEffect(() => {
@@ -104,6 +107,42 @@ export default function PortalBilling() {
           </div>
         </div>
       ))}
+
+      {invoices.length > 0 && (
+        <>
+          <h3 style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: 16, margin: "22px 0 8px" }}>
+            Invoices
+          </h3>
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>Number</th>
+                <th>Issued</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoices.map((v) => (
+                <tr key={v.id}>
+                  <td>
+                    <strong>{v.number || v.id.slice(0, 8)}</strong>
+                  </td>
+                  <td className="muted">{v.issue_date}</td>
+                  <td>{rands(v.total)}</td>
+                  <td className="muted">{v.status}</td>
+                  <td>
+                    <a className="linkish" href={`/invoice/${v.id}`}>
+                      View
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
 
       {payments.length > 0 && (
         <>

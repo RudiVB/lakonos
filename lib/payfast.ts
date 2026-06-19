@@ -104,3 +104,50 @@ export async function validateItn(rawBody: string): Promise<{ ok: boolean; data:
 
   return { ok: true, data };
 }
+
+// ===== Subscription management API (pause / unpause / cancel) =====
+const API_HOST = "https://api.payfast.co.za";
+
+// ISO8601 timestamp in SAST (+02:00), no milliseconds — matches PayFast examples
+function sastTimestamp() {
+  const d = new Date(Date.now() + 2 * 3600 * 1000);
+  return d.toISOString().replace(/\.\d{3}Z$/, "+02:00");
+}
+
+// PayFast API signature: all header vars (+ passphrase) sorted alphabetically, md5
+function apiSignature(headerVars: Record<string, string>) {
+  const passphrase = process.env.PAYFAST_PASSPHRASE || "";
+  const all: Record<string, string> = { ...headerVars };
+  if (passphrase) all["passphrase"] = passphrase;
+  const str = Object.keys(all)
+    .sort()
+    .map((k) => `${k}=${pfEncode(all[k])}`)
+    .join("&");
+  return crypto.createHash("md5").update(str).digest("hex");
+}
+
+// action: 'pause' | 'unpause' | 'cancel'
+export async function manageSubscription(token: string, action: "pause" | "unpause" | "cancel") {
+  const merchantId = process.env.PAYFAST_MERCHANT_ID || "";
+  const timestamp = sastTimestamp();
+  const headerVars = { "merchant-id": merchantId, timestamp, version: "v1" };
+  const signature = apiSignature(headerVars);
+  const testing = MODE === "live" ? "" : "?testing=true";
+
+  try {
+    const res = await fetch(`${API_HOST}/subscriptions/${encodeURIComponent(token)}/${action}${testing}`, {
+      method: "PUT",
+      headers: {
+        "merchant-id": merchantId,
+        version: "v1",
+        timestamp,
+        signature,
+        "content-type": "application/json",
+      },
+    });
+    const body = await res.text();
+    return { ok: res.ok, status: res.status, body };
+  } catch (e) {
+    return { ok: false, status: 0, body: (e as Error).message };
+  }
+}

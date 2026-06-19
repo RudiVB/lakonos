@@ -49,3 +49,22 @@ export async function notifyStaffClientTicket(subject: string, clientName: strin
     console.error("[notify] staff ticket alert failed:", (e as Error).message);
   }
 }
+
+// Emails the client when staff post a (non-internal) reply (no-op without Resend).
+export async function notifyClientTicketReply(toEmail: string | null, subject: string, body: string) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || !toEmail) return;
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(key);
+    const base = process.env.NEXT_PUBLIC_SITE_URL || "https://lakonos.vercel.app";
+    await resend.emails.send({
+      from: process.env.LAKONOS_ALERT_FROM || "Lakonos <onboarding@resend.dev>",
+      to: toEmail,
+      subject: `Re: ${subject}`,
+      text: `${body}\n\n—\nView the full conversation and reply in your portal:\n${base}/portal`,
+    });
+  } catch (e) {
+    console.error("[notify] client reply failed:", (e as Error).message);
+  }
+}

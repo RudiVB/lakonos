@@ -12,6 +12,7 @@ type Retainer = {
   status: string;
   next_bill_date: string | null;
   pf_subscribed: boolean;
+  pf_token: string | null;
 };
 
 const CYCLES = ["monthly", "quarterly", "annual"];
@@ -78,6 +79,23 @@ export default function RetainersPanel() {
     });
   }
 
+  // pause / resume / cancel the PayFast subscription
+  async function subAction(id: string, action: "pause" | "resume" | "cancel") {
+    if (action === "cancel" && !confirm("Cancel this subscription? Automatic billing will stop.")) return;
+    setErr("");
+    const r = await fetch("/api/admin/retainers/subscription", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ retainer_id: id, action }),
+    });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      setErr(d.error || "Action failed.");
+      return;
+    }
+    load();
+  }
+
   return (
     <div>
       <h1>Retainers</h1>
@@ -125,8 +143,21 @@ export default function RetainersPanel() {
                   </select>
                 </td>
                 <td>
-                  {r.pf_subscribed ? (
-                    <span className="badge green">Auto</span>
+                  {r.pf_subscribed && r.pf_token ? (
+                    <div className="row-actions">
+                      {r.status === "paused" ? (
+                        <button className="btn btn-ghost mini" onClick={() => subAction(r.id, "resume")}>
+                          Resume
+                        </button>
+                      ) : (
+                        <button className="btn btn-ghost mini" onClick={() => subAction(r.id, "pause")}>
+                          Pause
+                        </button>
+                      )}
+                      <button className="btn btn-ghost mini" onClick={() => subAction(r.id, "cancel")}>
+                        Cancel
+                      </button>
+                    </div>
                   ) : (
                     <span className="muted">—</span>
                   )}
