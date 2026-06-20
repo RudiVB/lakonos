@@ -633,7 +633,7 @@ export default function Home() {
         .lx .lx-trust { font-family: var(--disp); font-size: 13px; letter-spacing: .3px; color: var(--muted-2); margin-top: 18px; }
 
         /* ===== STAGE (single morphing visual) ===== */
-        .lx .lx-stage-wrap { position: relative; height: 300vh; }
+        .lx .lx-stage-wrap { position: relative; height: 180vh; }
         .lx .lx-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
         .lx .lx-aurora-wrap { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
         .lx .lx-aurora { position: absolute; inset: -25%; filter: blur(34px); opacity: .9;
@@ -662,8 +662,8 @@ export default function Home() {
         .lx .lx-hint svg { animation: lxBob 1.8s ease-in-out infinite; }
 
         /* ===== content sections ===== */
-        .lx .lx-section { position: relative; padding: clamp(84px,12vh,150px) 0; scroll-margin-top: 80px; }
-        .lx .lx-cvauto { content-visibility: auto; contain-intrinsic-size: auto 760px; }
+        .lx .lx-section { position: relative; padding: clamp(84px,12vh,150px) 0; scroll-margin-top: 80px; border-top: 1px solid var(--border); }
+        .lx .lx-cvauto { content-visibility: visible; }
         .lx .lx-skip { position: fixed; top: -60px; left: 16px; z-index: 90; background: var(--ink-2); border: 1px solid var(--border-2); color: var(--text); font-family: var(--disp); font-size: 14px; padding: 10px 16px; border-radius: 10px; transition: top .2s ease; }
         .lx .lx-skip:focus { top: 16px; }
         .lx .lx-intro { padding-top: clamp(70px,9vh,120px); }
@@ -705,7 +705,7 @@ export default function Home() {
         /* testimonial */
         .lx .lx-tsec { padding-top: clamp(40px,6vh,70px); }
         .lx .lx-quote { position: relative; max-width: 900px; margin: 0 auto; text-align: center; padding: 8px 0; }
-        .lx .lx-quote::before { content: "\\201C"; display: block; font-family: var(--disp); font-weight: 700; font-size: 90px; line-height: .6; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
+        .lx .lx-quote::before { content: "“"; display: block; font-family: var(--disp); font-weight: 700; font-size: 90px; line-height: .6; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
         .lx .lx-quote p { font-family: var(--disp); font-weight: 500; font-size: clamp(20px,3vw,32px); line-height: 1.3; letter-spacing: -.6px; color: var(--text); }
         .lx .lx-quote cite { display: block; margin-top: 22px; font-style: normal; font-size: 14px; letter-spacing: .4px; color: var(--muted); }
 
@@ -785,7 +785,7 @@ export default function Home() {
           .lx .lx-navcta { display: none; }
           .lx .lx-links { gap: 0; }
           .lx .lx-links a:not(.lx-login):not(.lx-btn) { display: none; }
-          .lx .lx-stage-wrap { height: 240vh; }
+          .lx .lx-stage-wrap { height: 150vh; }
           .lx .lx-caps { padding: 76px 22px 40px; }
           .lx .lx-vis { width: 88vw; }
           .lx .lx-stats, .lx .lx-pgrid { grid-template-columns: 1fr 1fr; }

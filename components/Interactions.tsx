@@ -3,13 +3,11 @@
 import { useEffect } from "react";
 
 /* =====================================================================
-   Interactions — a desktop "alive" layer for the homepage.
+   Interactions — desktop "alive" layer (cursor glow removed by request).
    - 3D pointer-tilt + moving specular glare on glass cards (.lx-card/.lx-tier)
    - Magnetic primary buttons (.lx-btn--primary)
-   - Soft cursor glow that blends over everything
    Attaches to existing DOM (no markup changes). Self-injects its CSS.
-   Does NOTHING on touch devices or with prefers-reduced-motion, so mobile
-   and accessibility are unaffected. Vanilla — no dependencies.
+   Does NOTHING on touch devices or with prefers-reduced-motion. No deps.
    ===================================================================== */
 
 export default function Interactions() {
@@ -23,49 +21,16 @@ export default function Interactions() {
 
     const cleanups: Array<() => void> = [];
 
-    // ---- inject scoped styles once ----
+    // ---- inject scoped styles once (glare only) ----
     const style = document.createElement("style");
     style.setAttribute("data-lx-interactions", "");
     style.textContent = `
-      .lx-cursor{position:fixed;top:0;left:0;width:24px;height:24px;border-radius:50%;
-        background:radial-gradient(circle, rgba(168,85,247,.9), rgba(34,211,238,.45) 55%, transparent 72%);
-        pointer-events:none;z-index:95;mix-blend-mode:screen;filter:blur(1px);opacity:0;
-        transition:width .22s ease,height .22s ease,opacity .3s ease;}
-      .lx-cursor.show{opacity:.85;}
-      .lx-cursor.lg{width:62px;height:62px;}
       .lx-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
         transition:opacity .25s ease;
-        background:radial-gradient(220px circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.16), transparent 60%);}
+        background:radial-gradient(220px circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.14), transparent 60%);}
     `;
     document.head.appendChild(style);
     cleanups.push(() => style.remove());
-
-    // ---- cursor glow (follows with lag, grows over interactive elements) ----
-    const cur = document.createElement("div");
-    cur.className = "lx-cursor";
-    document.body.appendChild(cur);
-    let cx = window.innerWidth / 2, cy = window.innerHeight / 2, tx = cx, ty = cy;
-    const onMove = (e: PointerEvent) => { tx = e.clientX; ty = e.clientY; cur.classList.add("show"); };
-    const onLeaveDoc = () => cur.classList.remove("show");
-    window.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("mouseleave", onLeaveDoc);
-    let raf = requestAnimationFrame(function loop() {
-      cx += (tx - cx) * 0.18; cy += (ty - cy) * 0.18;
-      cur.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
-      raf = requestAnimationFrame(loop);
-    });
-    cleanups.push(() => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onMove);
-      document.removeEventListener("mouseleave", onLeaveDoc);
-      cur.remove();
-    });
-
-    const grow = () => cur.classList.add("lg");
-    const shrink = () => cur.classList.remove("lg");
-    const hot = Array.from(root.querySelectorAll<HTMLElement>("a, button, summary, .lx-card, .lx-tier"));
-    hot.forEach((el) => { el.addEventListener("pointerenter", grow); el.addEventListener("pointerleave", shrink); });
-    cleanups.push(() => hot.forEach((el) => { el.removeEventListener("pointerenter", grow); el.removeEventListener("pointerleave", shrink); }));
 
     // ---- 3D tilt + glare on glass cards ----
     const cards = Array.from(root.querySelectorAll<HTMLElement>(".lx-card, .lx-tier"));
@@ -80,8 +45,8 @@ export default function Interactions() {
         const r = card.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width;
         const py = (e.clientY - r.top) / r.height;
-        const rx = (py - 0.5) * -8;  // tilt up/down (deg)
-        const ry = (px - 0.5) * 8;   // tilt left/right (deg)
+        const rx = (py - 0.5) * -7;  // tilt up/down (deg)
+        const ry = (px - 0.5) * 7;   // tilt left/right (deg)
         card.style.transform = `perspective(820px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
         glare.style.setProperty("--gx", (px * 100).toFixed(1) + "%");
         glare.style.setProperty("--gy", (py * 100).toFixed(1) + "%");
@@ -113,7 +78,7 @@ export default function Interactions() {
         const r = btn.getBoundingClientRect();
         const mx = e.clientX - (r.left + r.width / 2);
         const my = e.clientY - (r.top + r.height / 2);
-        btn.style.transform = `translate(${(mx * 0.25).toFixed(1)}px, ${(my * 0.35).toFixed(1)}px)`;
+        btn.style.transform = `translate(${(mx * 0.22).toFixed(1)}px, ${(my * 0.3).toFixed(1)}px)`;
       };
       const leave = () => { btn.style.transition = "transform .4s cubic-bezier(.2,.7,.2,1)"; btn.style.transform = ""; };
       btn.addEventListener("pointerenter", enter);
