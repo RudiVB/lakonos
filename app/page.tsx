@@ -635,6 +635,11 @@ export default function Home() {
       <style jsx global>{`
         body { background: #06060c; }
 
+        /* CRITICAL for the pinned hero: a parent with overflow-x:hidden silently turns
+           into a scroll container and breaks position:sticky. clip clips horizontally
+           WITHOUT creating a scroll container. !important beats whatever globals.css sets. */
+        html, body { overflow-x: clip !important; }
+
         /* Lenis smooth-scroll classes (only present while this page is mounted) */
         html.lenis, html.lenis body { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
