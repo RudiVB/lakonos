@@ -305,45 +305,56 @@ export default function Home() {
     };
   }, []);
 
-  /* ---- hero box: idle spin + scroll-driven assemble/come-alive + step dots ---- */
+  /* ---- persistent box: assembles in the hero, then shrinks + docks to a corner
+         and STAYS on screen (fixed) all the way down to the footer ---- */
   useEffect(() => {
-    const wrap = wrapRef.current;
+    const wrap = wrapRef.current;                                        // the tall hero section
     const cubeWrap = document.querySelector<HTMLElement>(".lx-cube-wrap");
     const cube = document.querySelector<HTMLElement>(".lx-cube");
     const dots = Array.from(document.querySelectorAll<HTMLElement>(".lx-progdot"));
-    if (!wrap || !cube || !cubeWrap) return;
+    if (!cube || !cubeWrap) return;                                      // box must exist (hero ref optional)
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const clamp = (v: number) => Math.min(Math.max(v, 0), 1);
+    const clamp = (v: number) => Math.min(Math.max(v, 0), 1);            // 0..1 limiter
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;   // linear interpolate
     let raf = 0;
     const t0 = performance.now();
     let lastStep = -1;
-    const setStep = (s: number) => {
+    const setStep = (s: number) => {                                     // light up the active progress dot
       if (s === lastStep) return;
       dots.forEach((d, i) => d.classList.toggle("on", i === s));
       lastStep = s;
     };
 
-    if (reduce) {
-      // static, assembled, alive — no motion
-      cube.style.transform = "rotateX(-18deg) rotateY(26deg)";
-      cubeWrap.style.setProperty("--assemble", "1");
-      cubeWrap.style.setProperty("--live", "1");
-      setStep(2);
-      return;
-    }
+    const place = (now: number) => {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const heroH = wrap ? wrap.offsetHeight : vh * 3;                   // total hero scroll height
+      const heroPin = Math.max(heroH - vh, 1);                          // scroll span of the hero story
+      const y = window.scrollY || window.pageYOffset || 0;              // whole-page scroll position
+      const hp = clamp(y / heroPin);                                    // hero progress: assemble + come alive
+      const dock = clamp((y - heroPin) / (vh * 0.8));                   // 0 during hero -> 1 once parked in corner
 
-    const frame = (now: number) => {
-      const rect = wrap.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      const p = total > 0 ? clamp(-rect.top / total) : 0;
-      const idle = ((now - t0) / 1000) * 8;                 // slow always-on spin
-      cube.style.transform = `rotateX(-18deg) rotateY(${(idle + p * 200).toFixed(2)}deg)`;
-      cubeWrap.style.setProperty("--assemble", clamp(p / 0.45).toFixed(3)); // assemble over first ~45%
-      cubeWrap.style.setProperty("--live", clamp((p - 0.55) / 0.3).toFixed(3)); // core/orbit in last third
-      setStep(p < 0.34 ? 0 : p < 0.67 ? 1 : 2);
-      raf = requestAnimationFrame(frame);
+      // panels fly together over the first ~45% of the hero; core/orbit switch on later and stay on
+      cubeWrap.style.setProperty("--assemble", clamp(hp / 0.45).toFixed(3));
+      cubeWrap.style.setProperty("--live", Math.max(clamp((hp - 0.55) / 0.3), dock).toFixed(3));
+
+      // rotation: gentle always-on idle spin + extra spin driven by hero scroll
+      const idle = reduce ? 0 : ((now - t0) / 1000) * 8;
+      cube.style.transform = `rotateX(-18deg) rotateY(${(idle + hp * 200).toFixed(2)}deg)`;
+
+      // position: centre of the screen during the hero, then shrink + dock to the
+      // BOTTOM-LEFT corner (kept off the bottom-right so it never sits on the WhatsApp button)
+      const cx = lerp(vw * 0.5, 74, dock);                             // x of box centre, px
+      const cy = lerp(vh * 0.42, vh - 74, dock);                       // y of box centre, px
+      const s  = lerp(1, 0.4, dock);                                   // 100% -> 40% size
+      cubeWrap.style.transform =
+        `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px) translate(-50%,-50%) scale(${s.toFixed(3)})`;
+
+      setStep(hp < 0.34 ? 0 : hp < 0.67 ? 1 : 2);
     };
+
+    // run every frame so the box follows scroll AND keeps its idle spin (idle is disabled when reduced-motion)
+    const frame = (now: number) => { place(now); raf = requestAnimationFrame(frame); };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
   }, []);
@@ -709,7 +720,7 @@ export default function Home() {
         .lx .lx-halo { fill: url(#lxcore); animation: lxPulse 3.4s ease-in-out infinite; }
 
         /* ---- hero 3D box: the single object that assembles + comes alive on scroll ---- */
-        .lx .lx-cube-wrap { position: absolute; left: 50%; top: 42%; width: 220px; height: 220px; transform: translate(-50%,-50%); perspective: 1000px; z-index: 2;
+        .lx .lx-cube-wrap { position: fixed; left: 0; top: 0; width: 220px; height: 220px; transform: translate(50vw,42vh) translate(-50%,-50%); perspective: 1000px; z-index: 40; pointer-events: none; will-change: transform;
           --assemble: 0; --live: 0; --half: 110px; --explode: 175px; --orbitR: 156px; }
         .lx .lx-cube { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(-18deg) rotateY(0deg); }
         .lx .lx-face { position: absolute; width: 220px; height: 220px; border-radius: 16px; opacity: calc(.14 + var(--assemble) * .86); will-change: transform, opacity;
@@ -873,7 +884,7 @@ export default function Home() {
           .lx .lx-links a:not(.lx-login):not(.lx-btn) { display: none; }
           .lx .lx-stage-wrap { height: 230vh; }
           .lx .lx-caps { padding: 0 22px 15vh; }
-          .lx .lx-cube-wrap { width: 150px; height: 150px; top: 40%; --half: 75px; --explode: 120px; --orbitR: 112px; }
+          .lx .lx-cube-wrap { width: 150px; height: 150px; --half: 75px; --explode: 120px; --orbitR: 112px; }
           .lx .lx-face { width: 150px; height: 150px; }
           .lx .lx-prog { bottom: 9vh; }
           .lx .lx-stats, .lx .lx-pgrid { grid-template-columns: 1fr 1fr; }
