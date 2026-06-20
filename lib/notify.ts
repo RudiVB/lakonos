@@ -31,6 +31,35 @@ export async function notifyNewLead(lead: {
   }
 }
 
+// Auto-replies to the lead so they get an instant acknowledgement.
+// Requires a VERIFIED sending domain in LAKONOS_AUTOREPLY_FROM (e.g.
+// "Lakonos <hello@lakonos.com>") — skips otherwise, since Resend's sandbox
+// sender can't deliver to arbitrary external addresses.
+export async function notifyLeadAutoReply(toEmail: string | null, name: string) {
+  const key = process.env.RESEND_API_KEY;
+  const from = process.env.LAKONOS_AUTOREPLY_FROM;
+  if (!key || !from || !toEmail) return;
+
+  const first = (name || "there").split(" ")[0];
+  try {
+    const resend = new Resend(key);
+    await resend.emails.send({
+      from,
+      to: toEmail,
+      replyTo: process.env.LAKONOS_ALERT_EMAIL || process.env.LAKONOS_OWNER_EMAIL || undefined,
+      subject: "Thanks — we’ve got your request",
+      text:
+        `Hi ${first},\n\n` +
+        `Thanks for reaching out to Lakonos. We’ve received your request and will get back to you within one business day with next steps.\n\n` +
+        `In the meantime, if it’s quicker, just reply to this email and tell us a bit more about what your team does by hand today.\n\n` +
+        `— Lakonos\n` +
+        `Custom business automation`,
+    });
+  } catch (e) {
+    console.error("[notify] auto-reply failed:", (e as Error).message);
+  }
+}
+
 // Alerts staff when a client opens or replies to a ticket (no-op without Resend).
 export async function notifyStaffClientTicket(subject: string, clientName: string, isReply = false) {
   const key = process.env.RESEND_API_KEY;

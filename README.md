@@ -1,91 +1,84 @@
-# Lakonos
+# Lakonos homepage — drop-in update
 
-Marketing site + lead capture for **Lakonos** — custom business automation for South African manufacturers.
+Extract this folder **into your repo root** (`C:\Users\Rudi\Desktop\lakonos`) and let it
+overwrite. All paths already match the repo layout.
 
-**Stack:** Next.js 14 (App Router) · TypeScript · Supabase (Postgres) · deployed on Vercel.
+## Files in this package
 
----
+| File | Target path | New/Replace |
+|------|-------------|-------------|
+| app/page.tsx | app/page.tsx | replace |
+| app/layout.tsx | app/layout.tsx | replace |
+| app/sitemap.ts | app/sitemap.ts | new |
+| app/robots.ts | app/robots.ts | new |
+| app/opengraph-image.tsx | app/opengraph-image.tsx | new |
+| app/api/lead/route.ts | app/api/lead/route.ts | replace |
+| components/LeadForm.tsx | components/LeadForm.tsx | replace |
+| components/ShaderField.tsx | components/ShaderField.tsx | new (WebGL hero) |
+| components/Interactions.tsx | components/Interactions.tsx | new (tilt/magnetic/cursor) |
+| components/Intro.tsx | components/Intro.tsx | new (cinematic intro) |
+| lib/notify.ts | lib/notify.ts | replace |
 
-## What's inside
+## 1. Required manual edit — app/globals.css
 
-```
-lakonos/
-├─ app/
-│  ├─ layout.tsx          # metadata, fonts, favicon
-│  ├─ page.tsx            # the landing page
-│  ├─ globals.css         # full design system (Spartan: stone / bronze / crimson)
-│  └─ api/lead/route.ts   # POST endpoint — saves a lead to Supabase
-├─ components/
-│  └─ LeadForm.tsx        # the contact form (client component)
-├─ lib/
-│  └─ supabaseServer.ts   # server-only Supabase client (service role)
-├─ supabase/
-│  └─ migrations/0001_init.sql   # the leads table + RLS
-└─ .env.example
-```
+NOT included here (so it can't clobber your version). In `app/globals.css`, inside `:root`,
+replace these three lines:
 
----
-
-## 1. Run it locally
-
-```bash
-npm install
-cp .env.example .env.local      # then fill in your Supabase values
-npm run dev                      # http://localhost:3000
+```css
+  --display:'Archivo', system-ui, -apple-system, sans-serif;
+  --body:'Inter', system-ui, -apple-system, sans-serif;
+  --mono:'Space Mono', ui-monospace, monospace;
 ```
 
-## 2. Set up Supabase
+with:
 
-1. Create a project at supabase.com.
-2. Open **SQL Editor** and run the contents of `supabase/migrations/0001_init.sql`.
-3. Go to **Settings → API** and copy these into `.env.local`:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://<your-ref>.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<service_role secret>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon public key>
+```css
+  --display: var(--font-archivo), 'Archivo', system-ui, -apple-system, sans-serif;
+  --body: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --mono: var(--font-mono), 'Space Mono', ui-monospace, monospace;
 ```
 
-> The **service role key is server-only**. It's used by `app/api/lead/route.ts` to insert leads. Never expose it to the browser or commit it.
+(These three lines are identical in every version, so this is safe. Without it, /admin + the
+case study fall back to system fonts.)
 
-Leads land in the **`leads`** table. View/sort them in the Supabase Table Editor.
+## 2. Install dependencies
 
-## 3. Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Lakonos: initial site + lead capture"
-git branch -M main
-# create an empty repo at github.com/new (name it 'lakonos'), then:
-git remote add origin https://github.com/RudiVB/lakonos.git
-git push -u origin main
+```powershell
+npm install lenis @vercel/analytics @vercel/speed-insights
 ```
 
-## 4. Deploy to Vercel
+(next/font, resend, and supabase are already in your project.)
 
-1. vercel.com → **Add New → Project** → import the `lakonos` repo.
-2. Framework preset auto-detects **Next.js** — no config needed.
-3. Add the same three env vars under **Settings → Environment Variables**.
-4. Deploy. Then point `lakonos.com` / `lakonos.co.za` at it in **Settings → Domains**.
+## 3. Database — already applied
 
----
+The `lakonos_leads` table already has the attribution columns
+(`utm_source, utm_medium, utm_campaign, referrer, landing_path`) — no action needed.
 
-## Notes
+## 4. Optional env (Vercel) to enable email
 
-- The contact form posts to `/api/lead`; on success it shows a confirmation and the lead is stored.
-- The old 3PL and the manufacturer are intentionally **not named** in the copy.
-- All brand colours/type live in `app/globals.css` (`:root`).
-- Logo assets (SVG): wordmark, icon, favicon — keep them in `/public` if you want to reference them as files.
+| Variable | Effect |
+|----------|--------|
+| RESEND_API_KEY | Owner alert + lead auto-reply |
+| LAKONOS_ALERT_EMAIL | Where lead alerts go (falls back to LAKONOS_OWNER_EMAIL) |
+| LAKONOS_AUTOREPLY_FROM | e.g. `Lakonos <hello@lakonos.com>` — set only with a verified domain |
 
----
+## 5. Deploy
 
-## Admin dashboard
+```powershell
+cd C:\Users\Rudi\Desktop\lakonos
+git add -A
+git commit -m "Homepage: shader hero, intro reveal, interactions, lead pipeline, fonts, logo"
+git push
+```
 
-Log in at **`/admin`** to view and follow up leads.
+## What's included visually
+- Live WebGL shader hero (mouse-reactive, progressive fallback)
+- Cinematic one-time intro reveal (real lambda mark draws itself, then LΛKONOS)
+- Interactive depth layer (3D tilt cards, magnetic buttons, cursor glow) — desktop only
+- Sora (headlines) + Hanken Grotesk (body), self-hosted via next/font
+- Real Lakonos lambda logo (gradient) in intro, nav, footer, favicon
+- Lead pipeline: UTM capture, honeypot + time-trap anti-spam, auto-reply
+- Vercel Analytics + Speed Insights + conversion events
+- SEO: OG image, sitemap, robots; perf (content-visibility) + a11y (skip link, contrast)
 
-Two extra env vars (in `.env.local` and on Vercel):
-- `ADMIN_PASSWORD` — the password you log in with
-- `ADMIN_SESSION_SECRET` — any long random string (signs the session cookie)
-
-Leads appear newest-first. Tick **Followed up**, add **notes** per lead, hit **Reply** to email them. Access is gated by an httpOnly signed cookie; the leads API reads/writes via the Supabase service-role key server-side, so the browser never touches the database directly.
+Mobile and /admin are unaffected by the desktop-only effects.
