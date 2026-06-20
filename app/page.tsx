@@ -648,7 +648,7 @@ export default function Home() {
           --grad:linear-gradient(115deg,#818cf8 0%,#c084fc 48%,#22d3ee 100%);
           --disp: var(--font-display), 'Sora', system-ui, -apple-system, sans-serif;
           --body: var(--font-body), 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-          background: var(--ink); color: var(--text); font-family: var(--body); line-height: 1.6; overflow-x: hidden;
+          background: var(--ink); color: var(--text); font-family: var(--body); line-height: 1.6; overflow-x: clip;
         }
         .lx *, .lx *::before, .lx *::after { box-sizing: border-box; }
         .lx a { color: inherit; text-decoration: none; }
