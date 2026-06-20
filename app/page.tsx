@@ -305,7 +305,49 @@ export default function Home() {
     };
   }, []);
 
-  /* ---- JSON-LD (Organization + Service + FAQ) ---- */
+  /* ---- hero box: idle spin + scroll-driven assemble/come-alive + step dots ---- */
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const cubeWrap = document.querySelector<HTMLElement>(".lx-cube-wrap");
+    const cube = document.querySelector<HTMLElement>(".lx-cube");
+    const dots = Array.from(document.querySelectorAll<HTMLElement>(".lx-progdot"));
+    if (!wrap || !cube || !cubeWrap) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const clamp = (v: number) => Math.min(Math.max(v, 0), 1);
+    let raf = 0;
+    const t0 = performance.now();
+    let lastStep = -1;
+    const setStep = (s: number) => {
+      if (s === lastStep) return;
+      dots.forEach((d, i) => d.classList.toggle("on", i === s));
+      lastStep = s;
+    };
+
+    if (reduce) {
+      // static, assembled, alive — no motion
+      cube.style.transform = "rotateX(-18deg) rotateY(26deg)";
+      cubeWrap.style.setProperty("--assemble", "1");
+      cubeWrap.style.setProperty("--live", "1");
+      setStep(2);
+      return;
+    }
+
+    const frame = (now: number) => {
+      const rect = wrap.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      const p = total > 0 ? clamp(-rect.top / total) : 0;
+      const idle = ((now - t0) / 1000) * 8;                 // slow always-on spin
+      cube.style.transform = `rotateX(-18deg) rotateY(${(idle + p * 200).toFixed(2)}deg)`;
+      cubeWrap.style.setProperty("--assemble", clamp(p / 0.45).toFixed(3)); // assemble over first ~45%
+      cubeWrap.style.setProperty("--live", clamp((p - 0.55) / 0.3).toFixed(3)); // core/orbit in last third
+      setStep(p < 0.34 ? 0 : p < 0.67 ? 1 : 2);
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   const orgLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -368,6 +410,15 @@ export default function Home() {
           <ShaderField />
           <div className="lx-gridbg" aria-hidden="true" />
 
+          <div className="lx-cube-wrap" aria-hidden="true">
+            <div className="lx-cube">
+              <div className="lx-face f1" /><div className="lx-face f2" /><div className="lx-face f3" />
+              <div className="lx-face f4" /><div className="lx-face f5" /><div className="lx-face f6" />
+            </div>
+            <div className="lx-orbit"><i /><i /><i /></div>
+            <div className="lx-cube-core" />
+          </div>
+
           <div className="lx-vis-wrap" ref={visRef} aria-hidden="true">
             <svg className="lx-vis" viewBox="0 0 600 360">
               <circle className="lx-ring" cx="300" cy="180" r="120" style={{ opacity: 0 }} />
@@ -389,6 +440,10 @@ export default function Home() {
                 <p>{c.p}</p>
               </div>
             ))}
+          </div>
+
+          <div className="lx-prog" aria-hidden="true">
+            <span className="lx-progdot on" /><span className="lx-progdot" /><span className="lx-progdot" />
           </div>
 
           <div className="lx-hint" ref={hintRef} aria-hidden="true">
@@ -633,14 +688,14 @@ export default function Home() {
         .lx .lx-trust { font-family: var(--disp); font-size: 13px; letter-spacing: .3px; color: var(--muted-2); margin-top: 18px; }
 
         /* ===== STAGE (single morphing visual) ===== */
-        .lx .lx-stage-wrap { position: relative; height: 180vh; }
+        .lx .lx-stage-wrap { position: relative; height: 220vh; }
         .lx .lx-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
         .lx .lx-aurora-wrap { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
         .lx .lx-aurora { position: absolute; inset: -25%; filter: blur(34px); opacity: .9;
           background: radial-gradient(38% 38% at 28% 30%, rgba(99,102,241,.40), transparent 62%), radial-gradient(40% 40% at 72% 38%, rgba(168,85,247,.34), transparent 62%), radial-gradient(46% 46% at 50% 78%, rgba(34,211,238,.22), transparent 64%);
           animation: lxDrift 20s ease-in-out infinite alternate; }
         .lx .lx-gridbg { position: absolute; inset: 0; pointer-events: none; opacity: .5; background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask: radial-gradient(circle at 50% 42%, #000 28%, transparent 74%); mask: radial-gradient(circle at 50% 42%, #000 28%, transparent 74%); }
-        .lx .lx-vis-wrap { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; will-change: transform; }
+        .lx .lx-vis-wrap { display: none; }
         .lx .lx-vis { width: min(640px,88vw); height: auto; overflow: visible; animation: lxFloat 8s ease-in-out infinite; }
         .lx .lx-node { fill: url(#lxg); }
         .lx .lx-edge { stroke: url(#lxg); stroke-width: 1.4; }
@@ -648,7 +703,33 @@ export default function Home() {
         .lx .lx-core { fill: url(#lxcore); animation: lxPulse 3.4s ease-in-out infinite; }
         .lx .lx-halo { fill: url(#lxcore); animation: lxPulse 3.4s ease-in-out infinite; }
 
-        .lx .lx-caps { position: absolute; inset: 0; display: grid; place-items: center; padding: 84px 24px 40px; }
+        /* ---- hero 3D box: the single object that assembles + comes alive on scroll ---- */
+        .lx .lx-cube-wrap { position: absolute; left: 50%; top: 42%; width: 220px; height: 220px; transform: translate(-50%,-50%); perspective: 1000px; z-index: 2;
+          --assemble: 0; --live: 0; --half: 110px; --explode: 175px; --orbitR: 156px; }
+        .lx .lx-cube { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(-18deg) rotateY(0deg); }
+        .lx .lx-face { position: absolute; width: 220px; height: 220px; border-radius: 16px; opacity: calc(.14 + var(--assemble) * .86); will-change: transform, opacity;
+          background: linear-gradient(135deg, rgba(129,140,248,.16), rgba(34,211,238,.05));
+          box-shadow: inset 0 0 0 1px rgba(165,180,252,.42), 0 0 60px rgba(139,92,246,.12); }
+        .lx .lx-face.f1 { transform: translateZ(calc(var(--half) + (1 - var(--assemble)) * var(--explode))); }
+        .lx .lx-face.f2 { transform: rotateY(180deg) translateZ(calc(var(--half) + (1 - var(--assemble)) * var(--explode))); }
+        .lx .lx-face.f3 { transform: rotateY(90deg) translateZ(calc(var(--half) + (1 - var(--assemble)) * var(--explode))); }
+        .lx .lx-face.f4 { transform: rotateY(-90deg) translateZ(calc(var(--half) + (1 - var(--assemble)) * var(--explode))); }
+        .lx .lx-face.f5 { transform: rotateX(90deg) translateZ(calc(var(--half) + (1 - var(--assemble)) * var(--explode))); }
+        .lx .lx-face.f6 { transform: rotateX(-90deg) translateZ(calc(var(--half) + (1 - var(--assemble)) * var(--explode))); }
+        .lx .lx-cube-core { position: absolute; left: 50%; top: 50%; width: 96px; height: 96px; border-radius: 50%; filter: blur(2px); opacity: var(--live);
+          background: radial-gradient(circle, rgba(216,180,254,.95), rgba(34,211,238,.4) 58%, transparent 72%);
+          transform: translate(-50%,-50%) scale(calc(.5 + var(--live) * .6)); }
+        .lx .lx-orbit { position: absolute; inset: -44px; opacity: var(--live); animation: lxSpin 14s linear infinite; }
+        .lx .lx-orbit i { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(120deg,#a5b4fc,#67e8f9); box-shadow: 0 0 14px rgba(103,232,249,.85); }
+        .lx .lx-orbit i:nth-child(1) { transform: translate(-50%,-50%) rotate(0deg) translateX(var(--orbitR)); }
+        .lx .lx-orbit i:nth-child(2) { transform: translate(-50%,-50%) rotate(120deg) translateX(var(--orbitR)); }
+        .lx .lx-orbit i:nth-child(3) { transform: translate(-50%,-50%) rotate(240deg) translateX(var(--orbitR)); }
+        @keyframes lxSpin { to { transform: rotate(360deg); } }
+        .lx .lx-prog { position: absolute; left: 50%; bottom: 11vh; transform: translateX(-50%); display: flex; gap: 9px; z-index: 3; }
+        .lx .lx-progdot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.22); transition: width .3s ease, background .3s ease, border-radius .3s ease; }
+        .lx .lx-progdot.on { width: 22px; border-radius: 4px; background: var(--grad); }
+
+        .lx .lx-caps { position: absolute; inset: 0; display: grid; place-items: end center; padding: 0 24px 19vh; }
         .lx .lx-caps::before { content: ""; grid-area: 1/1; width: min(780px,94vw); height: 320px; background: radial-gradient(closest-side, rgba(6,6,12,.7), transparent 75%); }
         .lx .lx-cap { grid-area: 1/1; max-width: min(720px,92vw); text-align: center; will-change: opacity, transform; }
         .lx .lx-cap h1, .lx .lx-cap h2 { font-family: var(--disp); font-weight: 600; font-size: clamp(30px,5.6vw,66px); line-height: 1.02; letter-spacing: -1.8px; margin: 0; }
@@ -785,9 +866,11 @@ export default function Home() {
           .lx .lx-navcta { display: none; }
           .lx .lx-links { gap: 0; }
           .lx .lx-links a:not(.lx-login):not(.lx-btn) { display: none; }
-          .lx .lx-stage-wrap { height: 150vh; }
-          .lx .lx-caps { padding: 76px 22px 40px; }
-          .lx .lx-vis { width: 88vw; }
+          .lx .lx-stage-wrap { height: 180vh; }
+          .lx .lx-caps { padding: 0 22px 15vh; }
+          .lx .lx-cube-wrap { width: 150px; height: 150px; top: 40%; --half: 75px; --explode: 120px; --orbitR: 112px; }
+          .lx .lx-face { width: 150px; height: 150px; }
+          .lx .lx-prog { bottom: 9vh; }
           .lx .lx-stats, .lx .lx-pgrid { grid-template-columns: 1fr 1fr; }
           .lx .lx-cards, .lx .lx-tiers, .lx .lx-steps { grid-template-columns: 1fr; }
           .lx .lx-footcols { grid-template-columns: 1fr 1fr; }
