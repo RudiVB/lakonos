@@ -688,7 +688,7 @@ export default function Home() {
         .lx .lx-trust { font-family: var(--disp); font-size: 13px; letter-spacing: .3px; color: var(--muted-2); margin-top: 18px; }
 
         /* ===== STAGE (single morphing visual) ===== */
-        .lx .lx-stage-wrap { position: relative; height: 220vh; }
+        .lx .lx-stage-wrap { position: relative; height: 300vh; }
         .lx .lx-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
         .lx .lx-aurora-wrap { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
         .lx .lx-aurora { position: absolute; inset: -25%; filter: blur(34px); opacity: .9;
@@ -866,7 +866,7 @@ export default function Home() {
           .lx .lx-navcta { display: none; }
           .lx .lx-links { gap: 0; }
           .lx .lx-links a:not(.lx-login):not(.lx-btn) { display: none; }
-          .lx .lx-stage-wrap { height: 180vh; }
+          .lx .lx-stage-wrap { height: 230vh; }
           .lx .lx-caps { padding: 0 22px 15vh; }
           .lx .lx-cube-wrap { width: 150px; height: 150px; top: 40%; --half: 75px; --explode: 120px; --orbitR: 112px; }
           .lx .lx-face { width: 150px; height: 150px; }
